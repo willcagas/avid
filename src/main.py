@@ -111,7 +111,7 @@ class DictationApp:
         logger.info("📝 Transcribing...")
         raw_text = self.transcriber.transcribe(temp_path)
         
-        if not raw_text:
+        if not raw_text or not raw_text.strip():
             logger.warning("No transcript produced")
             if self._ui:
                 self._ui.hide()
@@ -119,9 +119,14 @@ class DictationApp:
         
         logger.info(f"Raw: {raw_text[:100]}...")
         
-        # Format with LLM
-        logger.info(f"✨ Formatting ({self.config.mode} mode)...")
-        formatted_text = self.formatter.format(raw_text, self.config.mode)
+        # Skip formatter for very short transcripts (likely noise/blank)
+        if len(raw_text.strip()) < 3:
+            logger.info("Transcript too short, skipping formatter")
+            formatted_text = raw_text.strip()
+        else:
+            # Format with LLM
+            logger.info(f"✨ Formatting ({self.config.mode} mode)...")
+            formatted_text = self.formatter.format(raw_text, self.config.mode)
         
         logger.info(f"Formatted: {formatted_text[:100]}...")
         
