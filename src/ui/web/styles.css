@@ -101,6 +101,7 @@ body {
 }
 
 /* Flash Animations on Container for Mode Feedback */
+/* Mode Colors retained as requested */
 .idle-mic.flash-email {
     animation: flashEmail 0.8s ease-out;
 }
@@ -168,12 +169,13 @@ body {
     z-index: 1;
 }
 
+/* Changed to Light Pink #FFB6C1 */
 .pulse-ring {
     position: absolute;
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: rgba(255, 59, 48, 0.3);
+    background: rgba(255, 182, 193, 0.4);
     animation: pulse 1.5s ease-out infinite;
 }
 
@@ -202,7 +204,7 @@ body {
     height: 100%;
 }
 
-/* Mode Badge */
+/* Mode Badge - Mode Colors Retained */
 .mode-badge {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -218,12 +220,12 @@ body {
     background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
 }
 
-/* Processing Spinner */
+/* Processing Spinner - Changed to Light Pink */
 .processing-icon .spinner {
     width: 24px;
     height: 24px;
     border: 2px solid rgba(255, 255, 255, 0.2);
-    border-top-color: #667eea;
+    border-top-color: #FFB6C1;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -240,10 +242,10 @@ body {
     font-weight: 500;
 }
 
-/* Success Icon */
+/* Success Icon - Changed to Light Pink */
 .success-icon {
     font-size: 24px;
-    color: #38ef7d;
+    color: #FFB6C1;
     animation: successPop 0.3s ease-out;
 }
 
@@ -261,9 +263,9 @@ body {
     }
 }
 
-/* Success state styling */
+/* Success state styling - Changed to Light Pink */
 #success-state .status-text {
-    color: #38ef7d;
+    color: #FFB6C1;
 }
 
 /* Fade out animation for hiding */

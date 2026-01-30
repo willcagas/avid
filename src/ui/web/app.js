@@ -160,9 +160,11 @@ function startWaveformAnimation() {
             const noise = Math.random() * 0.1;
             const height = Math.max(4, (amp + noise) * maxHeight);
 
-            // Gradient color based on amplitude
-            const hue = 280 - (amp * 60); // Purple to pink
-            ctx.fillStyle = `hsla(${hue}, 80%, 60%, 0.9)`;
+            // Gradient color based on amplitude (Pink theme)
+            // Light Pink #FFB6C1 is roughly hue 350
+            // We can vary lightness or saturation based on amplitude
+            const alpha = 0.6 + (amp * 0.4);
+            ctx.fillStyle = `rgba(255, 182, 193, ${alpha})`;
 
             const x = i * barWidth + 2;
             const barH = height / 2;
@@ -175,7 +177,7 @@ function startWaveformAnimation() {
 
         // Add subtle glow effect
         ctx.shadowBlur = 10;
-        ctx.shadowColor = 'rgba(102, 126, 234, 0.3)';
+        ctx.shadowColor = 'rgba(255, 182, 193, 0.5)';
 
         animationFrame = requestAnimationFrame(draw);
     }
