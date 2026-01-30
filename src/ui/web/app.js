@@ -218,15 +218,6 @@ function showSuccess() {
 function updateModeDisplay() {
     modeBadge.textContent = currentMode.toUpperCase();
     modeBadge.classList.toggle('message', currentMode === 'message');
-
-    // Update idle icon
-    const idleMic = document.querySelector('.idle-mic');
-    if (idleMic) {
-        // Remove all show classes
-        idleMic.classList.remove('show-email', 'show-message', 'show-mic');
-        // Add specific class
-        idleMic.classList.add(`show-${currentMode}`);
-    }
 }
 
 // External API for Python
