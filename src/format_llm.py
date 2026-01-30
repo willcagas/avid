@@ -94,6 +94,11 @@ class Formatter:
             data = response.json()
             formatted = data["choices"][0]["message"]["content"].strip()
             
+            usage = data.get("usage", {})
+            prompt_tok = usage.get("prompt_tokens", 0)
+            comp_tok = usage.get("completion_tokens", 0)
+            logger.info(f"OpenAI Usage: {prompt_tok} prompt + {comp_tok} completion tokens")
+            
             logger.info(f"Formatted: {len(formatted)} chars")
             return formatted
             
