@@ -54,6 +54,20 @@ cp .env.example .env
 python -m src.main
 ```
 
+### Run with UI Overlay
+
+For visual feedback with waveform and sound cues:
+
+```bash
+python -m src.main --ui
+```
+
+This shows a floating overlay that displays:
+- 🎤 Waveform visualization while recording
+- ⏳ Processing spinner during transcription
+- ✓ Success indicator when done
+- Sound feedback on start/stop
+
 ## Configuration
 
 See `.env.example` for all available configuration options:
