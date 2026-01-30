@@ -306,6 +306,52 @@ At ~2000 words/week, formatter cost is effectively **pennies/month** on “mini�
 
 * Add LaunchAgent `.plist` that starts your tool on boot
 
+### Phase 5 — UI Overlay + Audio Feedback
+
+Visual and audio feedback when dictating:
+
+#### UI Features
+* **Recording overlay**: Shows waveform/visualization when recording
+* **Processing indicator**: Animation while transcribing/formatting
+* **Audio feedback**: Sound cues on start/stop recording
+* **Settings panel**: Configure mode, auto-paste, hotkey, etc.
+* **Draggable panel**: Movable overlay that stays on top
+
+#### Technology Options (Research)
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **Electron + React** | Full control, modern UI, rich ecosystem (e.g., OpenWhispr uses this) | Heavy (~100MB), separate JS stack |
+| **pywebview** | Python-first, native webview, lightweight, bundler-friendly | Limited native integration |
+| **NiceGUI** | Pure Python, browser-based, Vue.js UI, real-time updates | Runs web server, less "native" feel |
+| **Tkinter/CustomTkinter** | Built-in, no extra deps, native look | Dated look, limited animation support |
+| **PyQt6/PySide6** | Full native UI, rich widgets, good theming | Larger dependency, complex licensing |
+
+#### Recommended: pywebview + HTML/CSS/JS
+
+* Stays Python-centric (matches existing codebase)
+* Modern UI via web technologies (CSS animations, waveform canvas)
+* Lightweight (~5MB vs ~100MB for Electron)
+* Can create floating transparent windows
+* Bundler-friendly with py2app
+
+#### UX Patterns (from Superwhisper/OpenWhispr)
+
+1. **Press hotkey** → play "start" sound → show overlay with waveform
+2. **While recording** → animate waveform based on audio amplitude
+3. **Release hotkey** → play "stop" sound → show processing spinner
+4. **Done** → flash success indicator → hide overlay OR show text preview
+5. **Draggable** → user can reposition the overlay anywhere on screen
+
+#### Implementation Plan
+
+1. Create `ui/` directory with HTML/CSS/JS for overlay
+2. Add `DictationWindow` class using pywebview
+3. Integrate waveform visualization using Web Audio API or canvas
+4. Add audio feedback sounds (bundled WAV files)
+5. Create settings panel (mode toggle, auto-paste, hotkey config)
+6. Communicate between Python ↔ JS via pywebview bridge
+
 ---
 
 ## 12) Testing Plan
