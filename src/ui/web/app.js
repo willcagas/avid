@@ -58,23 +58,24 @@ async function toggleMode() {
     }
 }
 
-// Show brief visual feedback when mode changes (in idle state)
+// Show brief visual feedback when mode changes (flash icon)
 function showModeChangeFeedback() {
-    const badge = document.createElement('div');
-    badge.className = `mode-toast ${currentMode}`;
-    badge.textContent = currentMode.toUpperCase();
-    document.body.appendChild(badge);
+    const idleMic = document.querySelector('.idle-mic');
+    if (!idleMic) return;
 
-    // Animate
-    requestAnimationFrame(() => {
-        badge.classList.add('show');
-    });
+    // Remove existing classes to restart animation
+    idleMic.classList.remove('flash-email', 'flash-message');
 
-    // Remove after animation
+    // Trigger reflow
+    void idleMic.offsetWidth;
+
+    // Add flash class based on mode
+    idleMic.classList.add(currentMode === 'email' ? 'flash-email' : 'flash-message');
+
+    // Clean up after animation
     setTimeout(() => {
-        badge.classList.remove('show');
-        setTimeout(() => badge.remove(), 300);
-    }, 1500);
+        idleMic.classList.remove('flash-email', 'flash-message');
+    }, 800);
 }
 
 // Hide all states
