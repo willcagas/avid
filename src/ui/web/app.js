@@ -31,7 +31,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     // Start in idle state
     showIdle();
+
+    // Add click handler for mode toggle
+    const idleMic = document.querySelector('.idle-mic');
+    if (idleMic) {
+        idleMic.addEventListener('click', toggleMode);
+    }
 });
+
+// Toggle between modes
+async function toggleMode() {
+    const newMode = currentMode === 'email' ? 'message' : 'email';
+    currentMode = newMode;
+
+    // Update local UI
+    updateModeDisplay();
+    showModeChangeFeedback();
+
+    // Update Python backend
+    if (window.pywebview && window.pywebview.api) {
+        try {
+            await window.pywebview.api.set_mode(newMode);
+        } catch (e) {
+            console.log('Error setting mode:', e);
+        }
+    }
+}
+
+// Show brief visual feedback when mode changes (in idle state)
+function showModeChangeFeedback() {
+    const badge = document.createElement('div');
+    badge.className = `mode-toast ${currentMode}`;
+    badge.textContent = currentMode.toUpperCase();
+    document.body.appendChild(badge);
+
+    // Animate
+    requestAnimationFrame(() => {
+        badge.classList.add('show');
+    });
+
+    // Remove after animation
+    setTimeout(() => {
+        badge.classList.remove('show');
+        setTimeout(() => badge.remove(), 300);
+    }, 1500);
+}
 
 // Hide all states
 function hideAllStates() {

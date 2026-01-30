@@ -193,10 +193,16 @@ class DictationApp:
         self._play_start_sound = play_start_sound
         self._play_stop_sound = play_stop_sound
         
+        # Helper to update mode from UI
+        def on_mode_change(new_mode: str) -> None:
+            self.config.mode = new_mode
+            logger.info(f"Mode switched to: {new_mode}")
+
         # Create UI window
         self._ui = DictationWindow(
             mode=self.config.mode,
-            auto_paste=self.config.auto_paste
+            auto_paste=self.config.auto_paste,
+            on_mode_change=on_mode_change
         )
         self._ui.create_window()
         
