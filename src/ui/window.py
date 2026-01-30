@@ -3,6 +3,7 @@
 
 import webview
 import threading
+import queue
 from pathlib import Path
 from typing import Optional, Callable
 
@@ -50,6 +51,9 @@ class DictationWindow:
     Manages the pywebview overlay window for dictation feedback.
     
     Shows waveform during recording, processing spinner, and success indicator.
+    
+    Note: On macOS, webview.start() must be called from the main thread.
+    Use run_on_main_thread() to start the webview event loop.
     """
     
     def __init__(self, 
@@ -70,10 +74,25 @@ class DictationWindow:
         self._api.update_state(mode, auto_paste)
         
         self._window: Optional[webview.Window] = None
-        self._started = threading.Event()
+        self._command_queue: queue.Queue = queue.Queue()
+        self._ready = threading.Event()
     
-    def _create_window(self) -> None:
-        """Create the webview window (called from webview thread)."""
+    def _process_commands(self) -> None:
+        """Process queued JS commands (called from webview thread)."""
+        while True:
+            try:
+                cmd = self._command_queue.get_nowait()
+                if cmd and self._window:
+                    self._window.evaluate_js(cmd)
+            except queue.Empty:
+                break
+    
+    def _on_loaded(self) -> None:
+        """Called when the webview page is loaded."""
+        self._ready.set()
+    
+    def create_window(self) -> None:
+        """Create the webview window. Must be called before start()."""
         self._window = webview.create_window(
             title='AI Voice Dictation',
             url=str(WEB_DIR / "index.html"),
@@ -88,23 +107,31 @@ class DictationWindow:
             js_api=self._api,
             hidden=True  # Start hidden
         )
-        self._started.set()
+        self._window.events.loaded += self._on_loaded
     
     def start(self) -> None:
         """
-        Start the webview in a background thread.
+        Start the webview event loop.
         
-        This must be called before any other window methods.
+        IMPORTANT: This must be called from the main thread on macOS!
+        This call blocks until the window is closed.
         """
-        def run_webview():
-            self._create_window()
-            webview.start(debug=False)
+        if self._window is None:
+            self.create_window()
         
-        thread = threading.Thread(target=run_webview, daemon=True)
-        thread.start()
-        
-        # Wait for window to be created
-        self._started.wait(timeout=5.0)
+        # Start the webview - this blocks!
+        webview.start(debug=False)
+    
+    def _queue_js(self, js: str) -> None:
+        """Queue a JS command to be executed."""
+        self._command_queue.put(js)
+        # Trigger processing on the webview thread
+        if self._window:
+            try:
+                self._window.evaluate_js("null")  # Wake up the event loop
+                self._process_commands()
+            except Exception:
+                pass
     
     def show_recording(self) -> None:
         """Show the overlay with recording state."""

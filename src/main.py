@@ -50,23 +50,12 @@ class DictationApp:
         self._running = False
         self._use_ui = use_ui
         self._ui: Optional["DictationWindow"] = None
+        self._play_start_sound = lambda: None
+        self._play_stop_sound = lambda: None
         
         # For tracking amplitude during recording
         self._amplitude_thread: Optional[threading.Thread] = None
         self._recording = False
-    
-    def _init_ui(self) -> None:
-        """Initialize the UI overlay (lazy loading)."""
-        if self._use_ui and self._ui is None:
-            from .ui import DictationWindow, play_start_sound, play_stop_sound
-            self._play_start_sound = play_start_sound
-            self._play_stop_sound = play_stop_sound
-            self._ui = DictationWindow(
-                mode=self.config.mode,
-                auto_paste=self.config.auto_paste
-            )
-            self._ui.start()
-            logger.info("UI overlay initialized")
     
     def _update_amplitude(self) -> None:
         """Update UI with audio amplitude while recording."""
@@ -146,13 +135,19 @@ class DictationApp:
         
         logger.info("✅ Done!")
     
+    def _run_hotkey_listener(self) -> None:
+        """Run the hotkey listener in a background thread."""
+        self.hotkey_listener = HotkeyListener(
+            ptt_key=self.config.ptt_key,
+            on_press=self.on_ptt_press,
+            on_release=self.on_ptt_release
+        )
+        self.hotkey_listener.start()
+        self.hotkey_listener.wait()
+    
     def run(self) -> None:
-        """Start the application main loop."""
+        """Start the application main loop (CLI mode)."""
         self._running = True
-        
-        # Initialize UI if enabled
-        if self._use_ui:
-            self._init_ui()
         
         # Set up hotkey listener
         self.hotkey_listener = HotkeyListener(
@@ -178,13 +173,46 @@ class DictationApp:
         logger.info(f"Mode: {self.config.mode}")
         logger.info(f"PTT Key: {self.config.ptt_key}")
         logger.info(f"Auto-paste: {self.config.auto_paste}")
-        logger.info(f"UI Overlay: {'enabled' if self._use_ui else 'disabled'}")
         logger.info("=" * 50)
         logger.info("Hold PTT key to record, release to process.")
         logger.info("Press Ctrl+C to quit.")
         
         # Block until stopped
         self.hotkey_listener.wait()
+    
+    def run_with_ui(self) -> None:
+        """Start the application with UI overlay (webview on main thread)."""
+        from .ui import DictationWindow, play_start_sound, play_stop_sound
+        
+        self._running = True
+        self._play_start_sound = play_start_sound
+        self._play_stop_sound = play_stop_sound
+        
+        # Create UI window
+        self._ui = DictationWindow(
+            mode=self.config.mode,
+            auto_paste=self.config.auto_paste
+        )
+        self._ui.create_window()
+        
+        # Start hotkey listener in background thread
+        hotkey_thread = threading.Thread(
+            target=self._run_hotkey_listener,
+            daemon=True
+        )
+        hotkey_thread.start()
+        
+        logger.info("=" * 50)
+        logger.info("AI Voice Dictation is running (UI mode)!")
+        logger.info(f"Mode: {self.config.mode}")
+        logger.info(f"PTT Key: {self.config.ptt_key}")
+        logger.info(f"Auto-paste: {self.config.auto_paste}")
+        logger.info("=" * 50)
+        logger.info("Hold PTT key to record, release to process.")
+        logger.info("Close the overlay window to quit.")
+        
+        # Run webview on main thread (this blocks!)
+        self._ui.start()
     
     def stop(self) -> None:
         """Stop the application."""
@@ -207,7 +235,11 @@ def main():
     args = parser.parse_args()
     
     app = DictationApp(use_ui=args.ui)
-    app.run()
+    
+    if args.ui:
+        app.run_with_ui()
+    else:
+        app.run()
 
 
 if __name__ == "__main__":
