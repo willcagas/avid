@@ -10,7 +10,7 @@ import requests
 from typing import Literal, Optional
 
 from .config import Config
-from .prompts import SYSTEM_PROMPT, get_user_prompt
+from .prompts import get_system_prompt, get_user_prompt
 from .utils import setup_logging
 
 logger = setup_logging()
@@ -41,14 +41,14 @@ class Formatter:
     def format(
         self,
         raw_text: str,
-        mode: Literal["email", "message"]
+        mode: Literal["email", "message", "prompt"]
     ) -> str:
         """
         Format raw transcript using the LLM.
         
         Args:
             raw_text: Raw speech-to-text transcript
-            mode: Formatting mode ("email" or "message")
+            mode: Formatting mode ("email", "message", or "prompt")
         
         Returns:
             Formatted text, or raw_text on failure
@@ -73,7 +73,7 @@ class Formatter:
         payload = {
             "model": self.model,
             "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": get_system_prompt(mode)},
                 {"role": "user", "content": get_user_prompt(mode, raw_text)}
             ],
             "temperature": TEMPERATURE,

@@ -57,7 +57,11 @@ function showMenu() {
 
 // Toggle between modes
 async function toggleMode() {
-    const newMode = currentMode === 'email' ? 'message' : 'email';
+    let newMode;
+    if (currentMode === 'email') newMode = 'message';
+    else if (currentMode === 'message') newMode = 'prompt';
+    else newMode = 'email';
+
     currentMode = newMode;
 
     // Update local UI
@@ -89,7 +93,7 @@ function updateMenuDisplay() {
     if (modeLabel) modeLabel.textContent = currentMode.toUpperCase();
 
     if (modeControl) {
-        modeControl.classList.remove('show-email', 'show-message');
+        modeControl.classList.remove('show-email', 'show-message', 'show-prompt');
         modeControl.classList.add(`show-${currentMode}`);
     }
 }
@@ -218,8 +222,15 @@ function showSuccess() {
 
 // Update mode display
 function updateModeDisplay() {
+    if (!modeBadge) return;
     modeBadge.textContent = currentMode.toUpperCase();
-    modeBadge.classList.toggle('message', currentMode === 'message');
+
+    // Reset classes
+    modeBadge.classList.remove('message', 'prompt');
+
+    // Add active class if not default (email)
+    if (currentMode === 'message') modeBadge.classList.add('message');
+    else if (currentMode === 'prompt') modeBadge.classList.add('prompt');
 }
 
 // External API for Python

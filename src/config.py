@@ -26,7 +26,7 @@ class Config:
     llm_model: str
     
     # Dictation mode
-    mode: Literal["email", "message"]
+    mode: Literal["email", "message", "prompt"]
     
     # Auto-paste setting
     auto_paste: bool
@@ -54,7 +54,7 @@ class Config:
         
         # Dictation mode
         mode_val = os.getenv("MODE", "email").lower()
-        if mode_val not in ("email", "message"):
+        if mode_val not in ("email", "message", "prompt"):
             logger.warning(f"Invalid MODE '{mode_val}', defaulting to 'email'")
             mode_val = "email"
         self.mode = mode_val  # type: ignore

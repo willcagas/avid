@@ -2,14 +2,15 @@
 """
 LLM prompt templates for dictation formatting.
 
-Based on OpenWhispr's approach: clean up transcribed speech while
-preserving the speaker's natural voice, tone, and intent.
+Includes:
+- Dictation Cleanup (Email/Message): Cleans up speech while preserving voice.
+- Prompt Engineering (Prompt): Converts raw speech into structured CO-STAR prompts.
 """
 
 from typing import Literal
 
-# System prompt - based on OpenWhispr's UNIFIED_SYSTEM_PROMPT
-SYSTEM_PROMPT = """You are a dictation cleanup assistant integrated into a speech-to-text application. Your job is to process transcribed speech and output clean, polished text.
+# --- Default Cleanup System Prompt ---
+CLEANUP_SYSTEM_PROMPT = """You are a dictation cleanup assistant integrated into a speech-to-text application. Your job is to process transcribed speech and output clean, polished text.
 
 CORE RESPONSIBILITY:
 Clean up transcribed speech. This means:
@@ -32,7 +33,26 @@ OUTPUT RULES - ABSOLUTE:
 
 You are processing transcribed speech, so expect imperfect input. Your goal is to output exactly what the user intended to say, cleaned up and polished."""
 
-# Mode-specific prompts
+# --- Prompt Engineer System Prompt ---
+PROMPT_ENGINEER_SYSTEM_PROMPT = """You are an expert Prompt Engineer. Your goal is to rewrite the user's raw, rambling spoken request into a highly optimized, structured LLM prompt using the CO-STAR framework.
+
+CO-STAR FRAMEWORK:
+- (C) Context: Provide background information.
+- (O) Objective: Define the task clearly.
+- (S) Style: Specify the writing style.
+- (T) Tone: Set the emotional attitude.
+- (A) Audience: Identify who the response is for.
+- (R) Response: Define format and requirements.
+
+INSTRUCTIONS:
+1. Analyze the user's raw dictation to extract intent.
+2. Structure the intent into the CO-STAR format.
+3. Output ONLY the final structured prompt code block. Do not explain your reasoning.
+4. If the user dictates specific constraints, ensure they are in the 'Response' section.
+"""
+
+# --- User Prompts ---
+
 EMAIL_MODE_PROMPT = """Clean up this dictated text for an email.
 Apply smart formatting:
 - Greeting on its own line (if spoken)
@@ -48,13 +68,24 @@ Remove filler words but preserve the natural conversational style.
 
 Dictation: {transcript}"""
 
+PROMPT_MODE_PROMPT = """Refine this raw voice input into a structured AI prompt (CO-STAR).
 
-def get_user_prompt(mode: Literal["email", "message"], transcript: str) -> str:
+Raw Voice Input: {transcript}"""
+
+
+def get_system_prompt(mode: str) -> str:
+    """Get the appropriate system prompt for the mode."""
+    if mode == "prompt":
+        return PROMPT_ENGINEER_SYSTEM_PROMPT
+    return CLEANUP_SYSTEM_PROMPT
+
+
+def get_user_prompt(mode: str, transcript: str) -> str:
     """
     Build the user prompt for the given mode and transcript.
     
     Args:
-        mode: Either "email" or "message"
+        mode: "email", "message", or "prompt"
         transcript: Raw speech-to-text transcript
     
     Returns:
@@ -62,5 +93,7 @@ def get_user_prompt(mode: Literal["email", "message"], transcript: str) -> str:
     """
     if mode == "email":
         return EMAIL_MODE_PROMPT.format(transcript=transcript)
+    elif mode == "prompt":
+        return PROMPT_MODE_PROMPT.format(transcript=transcript)
     else:
         return MESSAGE_MODE_PROMPT.format(transcript=transcript)
