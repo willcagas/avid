@@ -121,3 +121,24 @@ class AudioRecorder:
     def is_recording(self) -> bool:
         """Check if currently recording."""
         return self._is_recording
+    
+    def get_amplitude(self) -> float:
+        """
+        Get the current audio amplitude (0.0 to 1.0).
+        
+        Uses the most recent audio frame to calculate RMS amplitude.
+        Returns 0.0 if not recording or no frames available.
+        """
+        if not self._is_recording or not self._frames:
+            return 0.0
+        
+        try:
+            # Use the most recent frame
+            recent_frame = self._frames[-1]
+            # Calculate RMS (root mean square) amplitude
+            rms = np.sqrt(np.mean(recent_frame ** 2))
+            # Normalize to 0-1 range (typical speech is around 0.01-0.1 RMS)
+            amplitude = min(1.0, rms * 10)
+            return float(amplitude)
+        except Exception:
+            return 0.0

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Dictation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="overlay" class="overlay hidden">
+        <!-- Recording State -->
+        <div id="recording-state" class="state hidden">
+            <div class="status-icon recording-icon">
+                <div class="pulse-ring"></div>
+                <div class="mic-icon">🎤</div>
+            </div>
+            <div class="waveform-container">
+                <canvas id="waveform" width="180" height="40"></canvas>
+            </div>
+            <div class="mode-badge" id="mode-badge">EMAIL</div>
+        </div>
+        
+        <!-- Processing State -->
+        <div id="processing-state" class="state hidden">
+            <div class="status-icon processing-icon">
+                <div class="spinner"></div>
+            </div>
+            <div class="status-text">Processing...</div>
+        </div>
+        
+        <!-- Success State -->
+        <div id="success-state" class="state hidden">
+            <div class="status-icon success-icon">✓</div>
+            <div class="status-text">Copied!</div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

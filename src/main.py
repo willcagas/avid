@@ -8,10 +8,13 @@ Orchestrates all components:
 - Transcriber: Converts audio to text via whisper.cpp
 - Formatter: Rewrites transcript via cloud LLM
 - Injector: Copies to clipboard and optionally pastes
+- DictationWindow: UI overlay for visual feedback (optional)
 """
 
+import argparse
 import signal
 import sys
+import threading
 from typing import Optional
 
 from .audio import AudioRecorder
@@ -28,8 +31,13 @@ logger = setup_logging()
 class DictationApp:
     """Main application orchestrating all dictation components."""
     
-    def __init__(self):
-        """Initialize all components."""
+    def __init__(self, use_ui: bool = False):
+        """
+        Initialize all components.
+        
+        Args:
+            use_ui: Whether to show the UI overlay
+        """
         logger.info("Initializing AI Voice Dictation...")
         
         self.config = Config()
@@ -40,20 +48,75 @@ class DictationApp:
         
         self.hotkey_listener: Optional[HotkeyListener] = None
         self._running = False
+        self._use_ui = use_ui
+        self._ui: Optional["DictationWindow"] = None
+        
+        # For tracking amplitude during recording
+        self._amplitude_thread: Optional[threading.Thread] = None
+        self._recording = False
+    
+    def _init_ui(self) -> None:
+        """Initialize the UI overlay (lazy loading)."""
+        if self._use_ui and self._ui is None:
+            from .ui import DictationWindow, play_start_sound, play_stop_sound
+            self._play_start_sound = play_start_sound
+            self._play_stop_sound = play_stop_sound
+            self._ui = DictationWindow(
+                mode=self.config.mode,
+                auto_paste=self.config.auto_paste
+            )
+            self._ui.start()
+            logger.info("UI overlay initialized")
+    
+    def _update_amplitude(self) -> None:
+        """Update UI with audio amplitude while recording."""
+        import time
+        while self._recording and self._ui:
+            amplitude = self.audio.get_amplitude()
+            self._ui.update_waveform(amplitude)
+            time.sleep(0.05)  # 20 FPS
     
     def on_ptt_press(self) -> None:
         """Handle PTT key press - start recording."""
         logger.info("🎤 Recording...")
+        
+        # Play start sound and show UI
+        if self._use_ui:
+            self._play_start_sound()
+            if self._ui:
+                self._ui.show_recording()
+        
+        # Start recording
         self.audio.start_recording()
+        self._recording = True
+        
+        # Start amplitude tracking for UI
+        if self._ui:
+            self._amplitude_thread = threading.Thread(
+                target=self._update_amplitude, 
+                daemon=True
+            )
+            self._amplitude_thread.start()
     
     def on_ptt_release(self) -> None:
         """Handle PTT key release - process audio pipeline."""
+        self._recording = False
         temp_path = get_temp_audio_path()
+        
+        # Play stop sound
+        if self._use_ui:
+            self._play_stop_sound()
         
         # Stop recording and save audio
         if not self.audio.stop_recording(temp_path):
             logger.warning("No audio recorded")
+            if self._ui:
+                self._ui.hide()
             return
+        
+        # Show processing state
+        if self._ui:
+            self._ui.show_processing()
         
         # Transcribe audio
         logger.info("📝 Transcribing...")
@@ -61,6 +124,8 @@ class DictationApp:
         
         if not raw_text:
             logger.warning("No transcript produced")
+            if self._ui:
+                self._ui.hide()
             return
         
         logger.info(f"Raw: {raw_text[:100]}...")
@@ -75,11 +140,19 @@ class DictationApp:
         logger.info("📋 Copying to clipboard...")
         self.injector.inject(formatted_text, self.config.auto_paste)
         
+        # Show success
+        if self._ui:
+            self._ui.show_success()
+        
         logger.info("✅ Done!")
     
     def run(self) -> None:
         """Start the application main loop."""
         self._running = True
+        
+        # Initialize UI if enabled
+        if self._use_ui:
+            self._init_ui()
         
         # Set up hotkey listener
         self.hotkey_listener = HotkeyListener(
@@ -105,6 +178,7 @@ class DictationApp:
         logger.info(f"Mode: {self.config.mode}")
         logger.info(f"PTT Key: {self.config.ptt_key}")
         logger.info(f"Auto-paste: {self.config.auto_paste}")
+        logger.info(f"UI Overlay: {'enabled' if self._use_ui else 'disabled'}")
         logger.info("=" * 50)
         logger.info("Hold PTT key to record, release to process.")
         logger.info("Press Ctrl+C to quit.")
@@ -115,13 +189,24 @@ class DictationApp:
     def stop(self) -> None:
         """Stop the application."""
         self._running = False
+        self._recording = False
         if self.hotkey_listener:
             self.hotkey_listener.stop()
+        if self._ui:
+            self._ui.destroy()
 
 
 def main():
     """Main entry point."""
-    app = DictationApp()
+    parser = argparse.ArgumentParser(description="AI Voice Dictation")
+    parser.add_argument(
+        "--ui",
+        action="store_true",
+        help="Enable UI overlay with waveform and visual feedback"
+    )
+    args = parser.parse_args()
+    
+    app = DictationApp(use_ui=args.ui)
     app.run()
 
 
