@@ -68,8 +68,28 @@ See `.env.example` for all available configuration options:
 
 ## Permissions
 
-- **Microphone**: Required for recording
-- **Accessibility**: Required only if `AUTO_PASTE=true` (to simulate ⌘V)
+### Microphone Access
+Required for recording. macOS will prompt automatically on first use.
+
+### Accessibility (for Auto-paste)
+
+To enable auto-paste (`AUTO_PASTE=true`), grant Accessibility access:
+
+1. Open **System Settings** → **Privacy & Security** → **Accessibility**
+2. Click the **+** button
+3. Add **Terminal** (or your IDE, e.g., VS Code, iTerm)
+4. Toggle it **ON**
+
+> **Note**: If the app still shows "not trusted" warnings, try removing and re-adding it from the list.
+
+### Enable Auto-paste
+
+1. Edit your `.env` file:
+   ```
+   AUTO_PASTE=true
+   ```
+2. Restart the app
+3. Text will now paste directly into the focused application
 
 ## License
 
