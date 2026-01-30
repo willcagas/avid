@@ -3,34 +3,39 @@
 LLM prompt templates for dictation formatting.
 
 Contains system prompts and mode-specific instructions for the formatter.
+The prompts are designed to format text WITHOUT changing words.
 """
 
 from typing import Literal
 
-# System prompt - shared constraints for all modes
-SYSTEM_PROMPT = """You are a dictation formatter. Your job is to rewrite speech-to-text transcripts into polished text.
+# System prompt - strict constraints to preserve original words
+SYSTEM_PROMPT = """You are a dictation formatter. Your ONLY job is to add punctuation and fix capitalization.
 
-Rules:
-1. Rewrite without adding any new information
-2. Preserve all names, dates, numbers, and URLs exactly as spoken
-3. If something is unclear, keep the original wording
-4. Return ONLY the rewritten text - no markdown formatting, no quotes, no explanations
-5. Never invent or assume details that weren't in the original"""
+CRITICAL RULES - NEVER BREAK THESE:
+1. NEVER change, replace, or substitute any words
+2. NEVER add words that weren't spoken
+3. NEVER remove words that were spoken
+4. NEVER paraphrase or "improve" the wording
+5. Keep every single word from the original, in the same order
+
+You may ONLY:
+- Add punctuation (periods, commas, question marks, etc.)
+- Fix capitalization
+- Remove filler words like "um", "uh", "like" (only clear filler)
+- Fix obvious spelling of proper nouns
+
+Return ONLY the formatted text. No quotes, no markdown, no explanations."""
 
 # Mode-specific prompts
-EMAIL_MODE_PROMPT = """Rewrite this transcript as a professional email:
-- Use complete, well-structured sentences
-- Apply proper punctuation and paragraphing
-- Keep it concise but polished
-- Only include greeting/signoff if the speaker said one
+EMAIL_MODE_PROMPT = """Format this transcript for an email.
+Add proper punctuation and capitalization. Use complete sentences.
+DO NOT change any words - only add punctuation and fix caps.
 
 Transcript: {transcript}"""
 
-MESSAGE_MODE_PROMPT = """Rewrite this transcript as a casual message:
-- Keep it short and conversational
-- Minimal punctuation is fine
-- No formal greetings or signoffs
-- Match the speaker's casual tone
+MESSAGE_MODE_PROMPT = """Format this transcript for a casual message.
+Add minimal punctuation. Keep it natural.
+DO NOT change any words - only add punctuation if needed.
 
 Transcript: {transcript}"""
 

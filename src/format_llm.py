@@ -18,7 +18,7 @@ logger = setup_logging()
 # API settings
 API_URL = "https://api.openai.com/v1/chat/completions"
 TIMEOUT = 30  # seconds
-TEMPERATURE = 0.3  # Low for stable output
+TEMPERATURE = 0.1  # Very low for strict word preservation
 
 
 class Formatter:
