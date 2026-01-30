@@ -322,13 +322,16 @@ body {
     justify-content: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.05);
-    margin: 0 8px;
-    padding: 4px 12px;
-    border-radius: 18px;
+    margin: 0 4px;
+    /* Reduced margin */
+    padding: 2px 10px;
+    /* Reduced padding */
+    border-radius: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    height: 34px;
+    height: 28px;
+    /* Reduced height from 34px */
 }
 
 .mode-control:hover {
