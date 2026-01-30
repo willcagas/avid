@@ -104,10 +104,10 @@ class DictationWindow:
             screen_width = 1920
             screen_height = 1080
         
-        window_width = 280
-        window_height = 70
+        window_width = 240
+        window_height = 50
         x = (screen_width - window_width) // 2
-        y = screen_height - window_height - 60  # 60px from bottom
+        y = screen_height - window_height - 30  # 30px from bottom
         
         self._window = webview.create_window(
             title='AI Voice Dictation',

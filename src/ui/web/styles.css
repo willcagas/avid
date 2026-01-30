@@ -31,10 +31,10 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: 40px;
-    /* Pillow shape */
+    /* Pillow shape for idle */
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow:
-        0 10px 40px rgba(0, 0, 0, 0.4),
+        0 8px 30px rgba(0, 0, 0, 0.4),
         0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 
     display: flex;
@@ -46,10 +46,10 @@ body {
     overflow: hidden;
 }
 
-/* Idle State (Small Icon) */
+/* Idle State (Small Icon) - Resize: 40x40 */
 .overlay.idle {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background: rgba(30, 30, 30, 0.6);
     /* More transparent when idle */
     border-radius: 50%;
@@ -66,13 +66,13 @@ body {
     transform: translateX(-50%) scale(1.1);
 }
 
-/* Expanded State */
+/* Expanded State - Resize: 240x50 */
 .overlay.active {
-    width: 260px;
+    width: 240px;
     /* Full width */
-    height: 60px;
+    height: 50px;
     background: rgba(30, 30, 30, 0.95);
-    border-radius: 30px;
+    border-radius: 25px;
     bottom: 5px;
     cursor: default;
 }
@@ -85,15 +85,16 @@ body {
     align-items: center;
     justify-content: center;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 20px;
+    font-size: 16px;
     transition: all 0.3s ease;
     border-radius: 50%;
 }
 
 /* Icon visibility management */
 .icon-svg {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    /* Smaller icons */
+    height: 20px;
     fill: currentColor;
     display: none;
     /* Hide by default */
@@ -168,14 +169,15 @@ body {
 .state {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 0 20px;
+    gap: 8px;
+    /* Tighter gap */
+    padding: 0 16px;
 }
 
 /* Status Icons */
 .status-icon {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -184,7 +186,7 @@ body {
 
 /* Recording Icon with Pulse */
 .recording-icon .mic-icon {
-    font-size: 24px;
+    font-size: 18px;
     z-index: 1;
 }
 
@@ -212,7 +214,7 @@ body {
 /* Waveform */
 .waveform-container {
     flex: 1;
-    height: 40px;
+    height: 32px;
     display: flex;
     align-items: center;
 }
@@ -226,10 +228,10 @@ body {
 .mode-badge {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 3px 6px;
+    border-radius: 4px;
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
@@ -240,9 +242,9 @@ body {
 
 /* Processing Spinner */
 .processing-icon .spinner {
-    width: 28px;
-    height: 28px;
-    border: 3px solid rgba(255, 255, 255, 0.2);
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-top-color: #667eea;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -256,13 +258,13 @@ body {
 
 .status-text {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
 }
 
 /* Success Icon */
 .success-icon {
-    font-size: 28px;
+    font-size: 24px;
     color: #38ef7d;
     animation: successPop 0.3s ease-out;
 }
@@ -310,12 +312,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 0 10px;
 }
 
 .control-btn {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     display: flex;
@@ -332,8 +334,8 @@ body {
 }
 
 .close-btn .icon-svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     display: block;
 }
 
@@ -343,15 +345,15 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     background: rgba(255, 255, 255, 0.05);
-    margin: 0 12px;
-    padding: 6px 16px;
-    border-radius: 20px;
+    margin: 0 8px;
+    padding: 4px 12px;
+    border-radius: 18px;
     cursor: pointer;
     transition: all 0.2s ease;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    height: 40px;
+    height: 34px;
 }
 
 .mode-control:hover {
@@ -360,8 +362,8 @@ body {
 }
 
 .current-mode-icon .icon-svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     display: none;
 }
 
@@ -377,24 +379,24 @@ body {
 }
 
 .mode-label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
     color: white;
 }
 
 .mode-switch-arrow {
-    font-size: 16px;
+    font-size: 14px;
     color: rgba(255, 255, 255, 0.4);
     font-weight: bold;
 }
 
-/* Menu expansion overwrites */
+/* Menu expansion overwrites - Resize: 240x50 */
 .overlay.menu-open {
-    width: 280px;
-    height: 60px;
+    width: 240px;
+    height: 50px;
     background: rgba(30, 30, 30, 0.98);
-    border-radius: 30px;
+    border-radius: 25px;
     bottom: 5px;
     cursor: default;
 }
