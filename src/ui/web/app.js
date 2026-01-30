@@ -68,13 +68,6 @@ async function toggleMode() {
     updateModeDisplay();
     updateMenuDisplay();
 
-    // Show feedback in menu
-    const label = document.getElementById('settings-mode-label');
-    if (label) {
-        label.style.transform = 'scale(1.1)';
-        setTimeout(() => label.style.transform = 'scale(1)', 200);
-    }
-
     // Update Python backend
     if (window.pywebview && window.pywebview.api) {
         try {
