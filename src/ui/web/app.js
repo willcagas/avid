@@ -44,6 +44,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Show mode selection menu
 function showMenu() {
+    // Notify Python to expand window
+    if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.set_ui_state('expanded');
+    }
+
     hideAllStates();
     document.getElementById('settings-state').classList.remove('hidden');
 
@@ -102,6 +107,11 @@ function hideAllStates() {
 
 // Show idle state (small persistent icon)
 function showIdle() {
+    // Notify Python to shrink window
+    if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.set_ui_state('idle');
+    }
+
     stopWaveformAnimation();
     hideAllStates();
     idleState.classList.remove('hidden');
@@ -119,6 +129,11 @@ function showIdle() {
 
 // Show recording state with waveform (expanded)
 function showRecording() {
+    // Notify Python to expand window
+    if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.set_ui_state('expanded');
+    }
+
     hideAllStates();
     recordingState.classList.remove('hidden');
     updateModeDisplay();
@@ -191,6 +206,11 @@ function stopWaveformAnimation() {
 
 // Show processing spinner
 function showProcessing() {
+    // Notify Python to expand window
+    if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.set_ui_state('expanded');
+    }
+
     stopWaveformAnimation();
     hideAllStates();
     processingState.classList.remove('hidden');

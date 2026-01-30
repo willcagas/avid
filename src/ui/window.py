@@ -45,6 +45,11 @@ class Api:
         self._mode = mode
         self._auto_paste = auto_paste
 
+    def set_ui_state(self, state: str) -> None:
+        """Request window resize based on UI state ('idle' or 'expanded')."""
+        if hasattr(self, '_on_ui_state_change') and self._on_ui_state_change:
+            self._on_ui_state_change(state)
+
 
 class DictationWindow:
     """
@@ -71,11 +76,35 @@ class DictationWindow:
             on_auto_paste_change: Callback when auto-paste changes via UI
         """
         self._api = Api(on_mode_change, on_auto_paste_change)
+        # Link API callback to window method
+        self._api._on_ui_state_change = self._handle_ui_state_change
         self._api.update_state(mode, auto_paste)
         
         self._window: Optional[webview.Window] = None
         self._command_queue: queue.Queue = queue.Queue()
         self._ready = threading.Event()
+        self._screen_width = 1920
+        self._screen_height = 1080
+    
+    def _handle_ui_state_change(self, state: str) -> None:
+        """Resize and reposition window based on UI state."""
+        if not self._window:
+            return
+            
+        # Run on main thread via command queue not possible for window ops?
+        # Pywebview window methods are thread-safe usually.
+        
+        if state == 'idle':
+            width, height = 60, 60
+        else: # expanded
+            width, height = 260, 80
+            
+        # Recalculate position (bottom center)
+        x = (self._screen_width - width) // 2
+        y = self._screen_height - height - 30
+        
+        self._window.resize(width, height)
+        self._window.move(x, y)
     
     def _process_commands(self) -> None:
         """Process queued JS commands (called from webview thread)."""
@@ -104,8 +133,12 @@ class DictationWindow:
             screen_width = 1920
             screen_height = 1080
         
-        window_width = 260
-        window_height = 80
+        self._screen_width = screen_width
+        self._screen_height = screen_height
+        
+        # Start small (idle)
+        window_width = 60
+        window_height = 60
         x = (screen_width - window_width) // 2
         y = screen_height - window_height - 30  # 30px from bottom
         
