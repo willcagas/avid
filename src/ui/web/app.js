@@ -11,7 +11,7 @@ const waveformCanvas = document.getElementById('waveform');
 const ctx = waveformCanvas.getContext('2d');
 
 // State
-let currentMode = 'email';
+let currentMode = 'message';
 let autoPaste = false;
 let waveformBars = new Array(20).fill(0);
 let animationFrame = null;
@@ -83,10 +83,10 @@ function showMenu() {
 // Toggle between modes
 async function toggleMode() {
     let newMode;
-    if (currentMode === 'email') newMode = 'message';
-    else if (currentMode === 'message') newMode = 'prompt';
-    else if (currentMode === 'prompt') newMode = 'notes';
-    else newMode = 'email';
+    if (currentMode === 'message') newMode = 'email';
+    else if (currentMode === 'email') newMode = 'notes';
+    else if (currentMode === 'notes') newMode = 'prompt';
+    else newMode = 'message';
 
     currentMode = newMode;
 

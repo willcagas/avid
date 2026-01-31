@@ -53,10 +53,10 @@ class Config:
         self.llm_model = os.getenv("LLM_MODEL", "gpt-4o-mini")
         
         # Dictation mode
-        mode_val = os.getenv("MODE", "email").lower()
+        mode_val = os.getenv("MODE", "message").lower()
         if mode_val not in ("email", "message", "prompt", "notes"):
-            logger.warning(f"Invalid MODE '{mode_val}', defaulting to 'email'")
-            mode_val = "email"
+            logger.warning(f"Invalid MODE '{mode_val}', defaulting to 'message'")
+            mode_val = "message"
         self.mode = mode_val  # type: ignore
         
         # Auto-paste
