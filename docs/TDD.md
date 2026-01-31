@@ -3,7 +3,7 @@
 **Goal:** A lightweight, personal dictation tool on macOS that uses:
 
 * **Local ASR**: `whisper.cpp` (fast, private for audio)
-* **AI formatting**: a **cloud LLM** to rewrite into **Email**, **Message**, or **Prompt** mode
+* **AI formatting**: a **cloud LLM** to rewrite into **Message**, **Email**, **Notes**, or **Prompt** mode
 * **Push-to-talk**: hold a key to record, release to transcribe + rewrite + paste
 * **Visual overlay**: Floating UI with waveform visualization and mode controls
 
@@ -17,10 +17,11 @@
 
   * On keydown: start recording
   * On keyup: stop recording and process
-* Three output modes:
+* Four output modes:
 
-  * **Email**: professional, complete sentences, nice punctuation/paragraphs
   * **Message**: casual, short, conversational
+  * **Email**: professional, complete sentences, nice punctuation/paragraphs
+  * **Notes**: semi-structured, scannable, fragment-tolerant (no invention of content)
   * **Prompt**: AI prompt engineering using CO-STAR framework (Context, Objective, Style, Tone, Audience, Response)
 * Output behavior:
 
@@ -129,7 +130,8 @@
 
 6. **ModeManager**
 
-   * Stores current mode (`email` / `message`)
+   * Stores current mode (`message` / `email` / `notes` / `prompt`)
+   * Cycle order: message → email → notes → prompt
    * Optional per-app default later
 
 ---
@@ -182,7 +184,7 @@ ai-dictation/
 
 * `OPENAI_API_KEY=...`
 * `LLM_MODEL=gpt-4o-mini` (or equivalent mini model you choose)
-* `MODE=email` (default)
+* `MODE=message` (default; options: message, email, notes, prompt)
 * `AUTO_PASTE=false`
 * `WHISPER_BIN=whisper-cpp`
 * `WHISPER_MODEL_PATH=~/models/whisper/ggml-base.en.bin`
@@ -190,7 +192,8 @@ ai-dictation/
 
 ### Defaults
 
-* Start in `message` mode if you’re mostly chatting; otherwise `email`.
+* Start in `message` mode (most common use case for quick replies)
+* Mode cycle: message → email → notes → prompt
 * Auto-paste off until permissions are set.
 
 ---
@@ -235,6 +238,13 @@ Use **one system prompt** + **one user message**:
 
 * **Email mode**: professional, full sentences, clean paragraphing, concise; optional greeting/signoff only if user said it
 * **Message mode**: casual, short, conversational; minimal punctuation ok; no greeting/signoff
+* **Notes mode**: semi-structured, scannable notes
+  * Favors clarity over polish
+  * Accepts fragments and incomplete sentences
+  * Uses bullets only when speaker clearly listed items
+  * Uses headings only when speaker indicated sections
+  * Removes filler words but preserves original wording
+  * Conservative: never invents structure or content
 * **Prompt mode**: AI Prompt Engineer using CO-STAR framework
   * **C**ontext: Background information
   * **O**bjective: What the AI should accomplish
@@ -343,8 +353,9 @@ At ~2000 words/week, formatter cost is effectively **pennies/month** on “mini�
 
 #### Visual Design
 * **Color themes**:
-  * Email mode: Purple (#667eea)
   * Message mode: Green (#38ef7d)
+  * Email mode: Purple (#667eea)
+  * Notes mode: Cyan/Teal (#00BCD4)
   * Prompt mode: Orange (#FF9F43)
 * **Animations**: Flash feedback on mode switch, smooth state transitions
 * **No shadows**: Flat design for minimal visual footprint
