@@ -5,6 +5,7 @@ LLM prompt templates for dictation formatting.
 Includes:
 - Dictation Cleanup (Email/Message): Cleans up speech while preserving voice.
 - Prompt Engineering (Prompt): Converts raw speech into structured CO-STAR prompts.
+- Notes Mode: Converts speech into clean, scannable notes.
 """
 
 from typing import Literal
@@ -51,6 +52,23 @@ INSTRUCTIONS:
 4. If the user dictates specific constraints, ensure they are in the 'Response' section.
 """
 
+# --- Notes Mode System Prompt ---
+NOTES_MODE_SYSTEM_PROMPT = """You are a voice dictation formatter operating in NOTES mode.
+
+Your job is to convert spoken dictation into clean, readable notes.
+
+Rules:
+- Do not add new information.
+- Do not invent structure unless clearly implied by the speaker.
+- Preserve names, numbers, dates, and technical terms exactly.
+- Keep a neutral, utilitarian tone.
+- Favor clarity and scannability over polished prose.
+- It is acceptable to output fragments or incomplete sentences.
+- Use short lines and simple formatting.
+- Do not include greetings, sign-offs, or conversational filler.
+- Output plain text only.
+"""
+
 # --- User Prompts ---
 
 EMAIL_MODE_PROMPT = """Clean up this dictated text for an email.
@@ -68,6 +86,20 @@ Remove filler words but preserve the natural conversational style.
 
 Dictation: {transcript}"""
 
+NOTES_MODE_PROMPT = """Rewrite the following dictation as concise notes.
+
+Guidelines:
+- Convert obvious pauses or topic shifts into new lines.
+- Use bullet points only if the speaker clearly listed items.
+- Use headings only if the speaker explicitly indicated a section.
+- Preserve the original wording as much as possible.
+- Remove filler words (um, uh, like) if they do not add meaning.
+
+Dictation:
+\"\"\"
+{transcript}
+\"\"\"""" 
+
 PROMPT_MODE_PROMPT = """Refine this raw voice input into a structured AI prompt (CO-STAR).
 
 Raw Voice Input: {transcript}"""
@@ -77,6 +109,8 @@ def get_system_prompt(mode: str) -> str:
     """Get the appropriate system prompt for the mode."""
     if mode == "prompt":
         return PROMPT_ENGINEER_SYSTEM_PROMPT
+    elif mode == "notes":
+        return NOTES_MODE_SYSTEM_PROMPT
     return CLEANUP_SYSTEM_PROMPT
 
 
@@ -85,7 +119,7 @@ def get_user_prompt(mode: str, transcript: str) -> str:
     Build the user prompt for the given mode and transcript.
     
     Args:
-        mode: "email", "message", or "prompt"
+        mode: "email", "message", "prompt", or "notes"
         transcript: Raw speech-to-text transcript
     
     Returns:
@@ -95,5 +129,7 @@ def get_user_prompt(mode: str, transcript: str) -> str:
         return EMAIL_MODE_PROMPT.format(transcript=transcript)
     elif mode == "prompt":
         return PROMPT_MODE_PROMPT.format(transcript=transcript)
+    elif mode == "notes":
+        return NOTES_MODE_PROMPT.format(transcript=transcript)
     else:
         return MESSAGE_MODE_PROMPT.format(transcript=transcript)

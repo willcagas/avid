@@ -109,6 +109,10 @@ body {
     animation: flashPrompt 0.8s ease-out;
 }
 
+.idle-mic.flash-notes {
+    animation: flashNotes 0.8s ease-out;
+}
+
 @keyframes flashEmail {
     0% {
         transform: scale(1);
@@ -152,6 +156,23 @@ body {
     50% {
         transform: scale(1.2);
         background: rgba(255, 159, 67, 0.6);
+    }
+
+    100% {
+        transform: scale(1);
+        background: transparent;
+    }
+}
+
+@keyframes flashNotes {
+    0% {
+        transform: scale(1);
+        background: transparent;
+    }
+
+    50% {
+        transform: scale(1.2);
+        background: rgba(0, 188, 212, 0.6);
     }
 
     100% {
@@ -252,6 +273,11 @@ body {
 .mode-badge.prompt {
     background: #FF9F43;
     /* Solid Orange */
+}
+
+.mode-badge.notes {
+    background: #00BCD4;
+    /* Solid Cyan/Teal */
 }
 
 /* Processing Spinner - Light Pink */
@@ -396,6 +422,11 @@ body {
 .mode-control.show-prompt .icon-prompt {
     display: block;
     color: #FF9F43;
+}
+
+.mode-control.show-notes .icon-notes {
+    display: block;
+    color: #00BCD4;
 }
 
 .mode-label {
