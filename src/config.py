@@ -52,12 +52,8 @@ class Config:
         # LLM model
         self.llm_model = os.getenv("LLM_MODEL", "gpt-4o-mini")
         
-        # Dictation mode
-        mode_val = os.getenv("MODE", "default").lower()
-        if mode_val not in ("default", "message", "email", "notes", "prompt"):
-            logger.warning(f"Invalid MODE '{mode_val}', defaulting to 'default'")
-            mode_val = "default"
-        self.mode = mode_val  # type: ignore
+        # Dictation mode (managed dynamically via UI, starts at default)
+        self.mode: Literal["default", "message", "email", "notes", "prompt"] = "default"
         
         # Auto-paste
         self.auto_paste = os.getenv("AUTO_PASTE", "false").lower() == "true"
