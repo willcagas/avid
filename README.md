@@ -87,10 +87,6 @@ AViD needs system permissions to function correctly:
 1.  **Microphone**: For recording audio.
 2.  **Accessibility**: For simulating keystrokes (Auto-Paste). Go to **System Settings > Privacy & Security > Accessibility** and add your **Terminal** or IDE (e.g., VSCode, iTerm).
 
-## Usage
-
-## Usage
-
 ### Running the App
 
 To start AViD:
