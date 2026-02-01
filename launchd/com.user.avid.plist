@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.user.aidictation</string>
+    <string>com.user.avid</string>
     
     <key>ProgramArguments</key>
     <array>
-        <string>/path/to/ai-dictation/scripts/run.sh</string>
+        <string>/path/to/avid/scripts/run.sh</string>
         <string>--ui</string>
     </array>
     
@@ -18,13 +18,13 @@
     <true/>
     
     <key>WorkingDirectory</key>
-    <string>/path/to/ai-dictation</string>
+    <string>/path/to/avid</string>
     
     <key>StandardOutPath</key>
-    <string>/tmp/aidictation.out.log</string>
+    <string>/tmp/avid.out.log</string>
     
     <key>StandardErrorPath</key>
-    <string>/tmp/aidictation.err.log</string>
+    <string>/tmp/avid.err.log</string>
     
     <key>EnvironmentVariables</key>
     <dict>

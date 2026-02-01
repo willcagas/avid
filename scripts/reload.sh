@@ -1,10 +1,10 @@
 #!/bin/bash
 # reload.sh
-# Restarts the AI Voice Dictation LaunchAgent to apply code changes.
+# Restarts the AViD LaunchAgent to apply code changes.
 
-SERVICE_NAME="com.user.aidictation"
+SERVICE_NAME="com.user.avid"
 
-echo "♻️  Reloading AI Voice Dictation..."
+echo "♻️  Reloading AViD..."
 
 # Stop the service (KeepAlive in plist should restart it, but we can be explicit)
 # 'kickstart -k' kills and restarts the service

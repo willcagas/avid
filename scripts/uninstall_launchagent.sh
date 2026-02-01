@@ -1,11 +1,11 @@
 #!/bin/bash
 # uninstall_launchagent.sh
-# Removes the LaunchAgent for AI Voice Dictation
+# Removes the LaunchAgent for AViD
 
-PLIST_NAME="com.user.aidictation.plist"
+PLIST_NAME="com.user.avid.plist"
 PLIST_DEST="$HOME/Library/LaunchAgents/$PLIST_NAME"
 
-echo "Uninstalling LaunchAgent for AI Voice Dictation..."
+echo "Uninstalling LaunchAgent for AViD..."
 
 # Check if plist exists
 if [ ! -f "$PLIST_DEST" ]; then
@@ -15,7 +15,7 @@ fi
 
 # Stop the agent if running
 echo "Stopping agent..."
-launchctl stop com.user.aidictation 2>/dev/null
+launchctl stop com.user.avid 2>/dev/null
 
 # Unload the agent
 echo "Unloading agent..."
@@ -27,6 +27,6 @@ rm "$PLIST_DEST"
 
 # Clean up log files (optional)
 echo "Cleaning up log files..."
-rm -f /tmp/aidictation.out.log /tmp/aidictation.err.log
+rm -f /tmp/avid.out.log /tmp/avid.err.log
 
-echo "Done! AI Voice Dictation will no longer start at login."
+echo "Done! AViD will no longer start at login."

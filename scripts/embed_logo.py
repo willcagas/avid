@@ -3,7 +3,7 @@ import base64
 from pathlib import Path
 
 # Paths
-base_dir = Path("/Users/wcagas/Tech/ai-voice-dictation")
+base_dir = Path("/Users/wcagas/Tech/avid")
 logo_path = base_dir / "src/ui/web/logo.png"
 html_path = base_dir / "src/ui/web/index.html"
 
