@@ -89,51 +89,40 @@ AViD needs system permissions to function correctly:
 
 ## Usage
 
-### Manual Run
+## Usage
 
-To test the application with the UI overlay:
+### Running the App
 
-```bash
-source .venv/bin/activate
-python -m src.main --ui
-```
+To start AViD:
+
+1.  Double-click **`AViD.command`** in the project folder.
+2.  The Terminal window will appear for a split second and then vanish (this is normal).
+3.  The **AViD** overlay (microphone icon) will appear at the bottom of your screen.
 
 - **Hold** `Right Option` to record.
 - **Speak** your thought.
 - **Release** to process.
 - The overlay will show the status; text will auto-paste when ready.
 
-### Install as Background Service (Recommended)
+> **Note**: The first time you run it, macOS may ask for **Microphone** and **Accessibility** permissions. Grant them to allow recording and auto-pasting.
 
-To have AViD run automatically at login (and restart if it crashes):
+### Auto-Start at Login
 
-```bash
-./scripts/install_launchagent.sh
-```
+To have AViD run automatically when you log in:
 
-> **Note**: If you encounter a "Permission denied" error or "Operation not permitted", run this command to fix ownership of your LaunchAgents directory:
-> ```bash
-> sudo chown -R $(whoami) ~/Library/LaunchAgents
-> // And try installing again
-> ./scripts/install_launchagent.sh
-> ```
-
-### Making Changes
-
-If you modify the code, you can instantly reload the background service without restarting your computer:
-
-```bash
-./scripts/reload.sh
-```
+1.  Open **System Settings**.
+2.  Go to **General > Login Items**.
+3.  Click the **+** button under "Open at Login".
+4.  Navigate to the `avid` folder and select the `AViD.command` file.
 
 ## Project Structure
 
+- `AViD.command`: Double-clickable launcher app (hides terminal).
 - `src/main.py`: Application entry point.
 - `src/audio.py`: Audio recording via `sounddevice`.
 - `src/transcribe.py`: Local transcription handling.
 - `src/format_llm.py`: Logic for GPT-4o formatting.
 - `src/ui/`: WebView based UI overlay (HTML/CSS/JS).
-- `launchd/`: macOS LaunchAgent configuration.
 
 ## License
 

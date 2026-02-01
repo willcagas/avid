@@ -30,7 +30,9 @@
   * Optional: auto-paste into the focused app
 * Runs as a lightweight background app:
 
-  * LaunchAgent service that starts at login
+* Runs as a lightweight background app:
+  * Native Launcher (`AViD.command`) that runs silently (no terminal window)
+  * Can be added to System Settings > Login Items
   * Floating UI overlay with waveform visualization
   * Draggable window that maintains position between states
   * Smart click detection (distinguishes taps from drags)
@@ -154,6 +156,7 @@
 
 ```
 ai-dictation/
+  AViD.command
   README.md
   pyproject.toml  (or requirements.txt)
   .env.example
@@ -170,9 +173,6 @@ ai-dictation/
   models/               (optional; or store in ~/models/whisper)
   scripts/
     run.sh
-    install_launchagent.sh
-  launchd/
-    com.yourname.aidictation.plist
 ```
 
 ---
@@ -333,9 +333,10 @@ At ~2000 words/week, formatter cost is effectively **pennies/month** on “mini�
 * Add `rumps` menu: Mode: Email/Message, Auto-paste on/off, Quit
 * Still lightweight
 
-### Phase 4 — Launch at login
-
-* Add LaunchAgent `.plist` that starts your tool on boot
+### Phase 4 — Native Launcher (Windows-like Stealth Mode)
+* Create `AViD.command` launcher
+* Implement self-hiding terminal window logic
+* Configure custom application icon
 
 ### Phase 5 — UI Overlay + Audio Feedback ✅ COMPLETED
 
