@@ -2,7 +2,6 @@
 """Audio feedback for recording start/stop."""
 
 import subprocess
-import os
 from pathlib import Path
 
 # Get the sounds directory path

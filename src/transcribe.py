@@ -17,7 +17,7 @@ logger = setup_logging()
 
 class Transcriber:
     """Transcribes audio files using whisper.cpp CLI."""
-    
+
     def __init__(self, config: Config):
         """
         Initialize the transcriber.
@@ -27,10 +27,11 @@ class Transcriber:
         """
         self.whisper_bin = config.whisper_bin
         self.model_path = config.whisper_model_path
-        
+        self.timeout = config.whisper_timeout
+
         # Get number of CPU cores for threading (use half)
         self.threads = max(1, os.cpu_count() // 2) if os.cpu_count() else 4
-    
+
     def transcribe(self, audio_path: str) -> str:
         """
         Transcribe an audio file to text.
@@ -45,11 +46,11 @@ class Transcriber:
         if not audio_file.exists():
             logger.error(f"Audio file not found: {audio_path}")
             return ""
-        
+
         # Output file path (whisper-cpp adds .txt extension)
         output_base = str(audio_file.with_suffix(""))
         output_txt = output_base + ".txt"
-        
+
         # Build whisper-cpp command
         cmd = [
             self.whisper_bin,
@@ -60,18 +61,18 @@ class Transcriber:
             "-of", output_base,  # Output file base name
             "--no-timestamps",  # Don't include timestamps
         ]
-        
+
         logger.info(f"Transcribing: {audio_path}")
-        
+
         try:
-            result = subprocess.run(
+            subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
                 check=True,
-                timeout=60  # 1 minute timeout
+                timeout=self.timeout
             )
-            
+
             # Read the output text file
             if Path(output_txt).exists():
                 transcript = Path(output_txt).read_text().strip()
@@ -82,7 +83,7 @@ class Transcriber:
             else:
                 logger.error("Whisper did not produce output file")
                 return ""
-                
+
         except subprocess.CalledProcessError as e:
             logger.error(f"Whisper failed: {e.stderr}")
             return ""

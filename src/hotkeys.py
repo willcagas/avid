@@ -5,7 +5,7 @@ HotkeyListener component for push-to-talk functionality.
 Uses pynput to detect global key press/release events for PTT.
 """
 
-from typing import Callable, Optional, Union
+from collections.abc import Callable
 
 from pynput import keyboard
 from pynput.keyboard import Key, KeyCode
@@ -51,7 +51,7 @@ KEY_MAP = {
 
 class HotkeyListener:
     """Listens for push-to-talk key press/release events."""
-    
+
     def __init__(
         self,
         ptt_key: str,
@@ -70,33 +70,33 @@ class HotkeyListener:
         self.ptt_key_name = ptt_key
         self.on_press_callback = on_press
         self.on_release_callback = on_release
-        
-        self._listener: Optional[keyboard.Listener] = None
+
+        self._listener: keyboard.Listener | None = None
         self._key_held = False
-    
-    def _resolve_key(self, key_name: str) -> Union[Key, KeyCode]:
+
+    def _resolve_key(self, key_name: str) -> Key | KeyCode:
         """Resolve key name to pynput Key or KeyCode."""
         key_lower = key_name.lower()
-        
+
         if key_lower in KEY_MAP:
             return KEY_MAP[key_lower]
-        
+
         # Single character key
         if len(key_name) == 1:
             return KeyCode.from_char(key_name)
-        
+
         logger.warning(f"Unknown key '{key_name}', defaulting to alt_r")
         return Key.alt_r
-    
-    def _matches_ptt_key(self, key: Union[Key, KeyCode]) -> bool:
+
+    def _matches_ptt_key(self, key: Key | KeyCode) -> bool:
         """Check if the pressed key matches the PTT key."""
         return key == self.ptt_key
-    
-    def _on_press(self, key: Union[Key, KeyCode, None]) -> None:
+
+    def _on_press(self, key: Key | KeyCode | None) -> None:
         """Handle key press events."""
         if key is None:
             return
-            
+
         if self._matches_ptt_key(key) and not self._key_held:
             self._key_held = True
             logger.debug(f"PTT key pressed: {self.ptt_key_name}")
@@ -104,12 +104,12 @@ class HotkeyListener:
                 self.on_press_callback()
             except Exception as e:
                 logger.error(f"Error in on_press callback: {e}")
-    
-    def _on_release(self, key: Union[Key, KeyCode, None]) -> None:
+
+    def _on_release(self, key: Key | KeyCode | None) -> None:
         """Handle key release events."""
         if key is None:
             return
-            
+
         if self._matches_ptt_key(key) and self._key_held:
             self._key_held = False
             logger.debug(f"PTT key released: {self.ptt_key_name}")
@@ -117,27 +117,27 @@ class HotkeyListener:
                 self.on_release_callback()
             except Exception as e:
                 logger.error(f"Error in on_release callback: {e}")
-    
+
     def start(self) -> None:
         """Start listening for hotkey events."""
         if self._listener is not None:
             logger.warning("Listener already running")
             return
-        
+
         self._listener = keyboard.Listener(
             on_press=self._on_press,
             on_release=self._on_release
         )
         self._listener.start()
         logger.info(f"Hotkey listener started (PTT key: {self.ptt_key_name})")
-    
+
     def stop(self) -> None:
         """Stop listening for hotkey events."""
         if self._listener is not None:
             self._listener.stop()
             self._listener = None
             logger.info("Hotkey listener stopped")
-    
+
     def wait(self) -> None:
         """Wait for the listener to finish (blocking)."""
         if self._listener is not None:

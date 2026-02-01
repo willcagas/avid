@@ -27,7 +27,7 @@ def setup_logging(level: int = logging.INFO) -> logging.Logger:
         Configured logger instance
     """
     logger = logging.getLogger("ai-dictation")
-    
+
     if not logger.handlers:
         handler = logging.StreamHandler()
         formatter = logging.Formatter(
@@ -36,7 +36,7 @@ def setup_logging(level: int = logging.INFO) -> logging.Logger:
         )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
-    
+
     logger.setLevel(level)
     return logger
 

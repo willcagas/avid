@@ -8,7 +8,6 @@ Includes:
 - Notes Mode: Converts speech into clean, scannable notes.
 """
 
-from typing import Literal
 
 # --- Default Cleanup System Prompt ---
 CLEANUP_SYSTEM_PROMPT = """You are a dictation cleanup assistant integrated into a speech-to-text application. Your job is to process transcribed speech and output clean, polished text.
@@ -108,7 +107,7 @@ Guidelines:
 Dictation:
 \"\"\"
 {transcript}
-\"\"\"""" 
+\"\"\""""
 
 PROMPT_MODE_PROMPT = """Refine this raw voice input into a structured AI prompt (CO-STAR).
 
