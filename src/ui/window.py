@@ -188,6 +188,21 @@ class DictationWindow:
         )
         self._window.events.loaded += self._on_loaded
 
+    def _set_app_icon(self) -> None:
+        """Set the application icon in the macOS Dock."""
+        try:
+            import AppKit
+            
+            # Try to load the logo
+            icon_path = str(WEB_DIR / "logo.png")
+            image = AppKit.NSImage.alloc().initByReferencingFile_(icon_path)
+            
+            if image and image.isValid():
+                AppKit.NSApplication.sharedApplication().setApplicationIconImage_(image)
+        except Exception:
+            # If pyobjc is not installed or other error, just ignore
+            pass
+
     def start(self) -> None:
         """
         Start the webview event loop.
@@ -197,6 +212,9 @@ class DictationWindow:
         """
         if self._window is None:
             self.create_window()
+
+        # Update the Dock icon
+        self._set_app_icon()
 
         # Start the webview - this blocks!
         webview.start(debug=False)
