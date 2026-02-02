@@ -21,6 +21,7 @@ from .config import Config
 from .format_llm import Formatter
 from .hotkeys import HotkeyListener
 from .inject import Injector
+from .server import WhisperServer
 from .transcribe import Transcriber
 from .utils import get_temp_audio_path, setup_logging
 
@@ -40,6 +41,11 @@ class DictationApp:
         logger.info("Initializing AI Voice Dictation...")
 
         self.config = Config()
+        
+        # Start Whisper Server
+        self.server = WhisperServer(self.config)
+        self.server.start()
+        
         self.audio = AudioRecorder()
         self.transcriber = Transcriber(self.config)
         self.formatter = Formatter(self.config)
@@ -242,6 +248,8 @@ class DictationApp:
             self.hotkey_listener.stop()
         if self._ui:
             self._ui.destroy()
+        if hasattr(self, 'server'):
+            self.server.stop()
 
 
 def main():

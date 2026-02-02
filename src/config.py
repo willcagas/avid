@@ -36,6 +36,8 @@ class Config:
 
     # Whisper.cpp
     whisper_bin: str
+    whisper_server_bin: str
+    whisper_port: int
     whisper_model_path: str
     whisper_timeout: int
 
@@ -70,6 +72,8 @@ class Config:
 
         # Whisper settings
         self.whisper_bin = os.getenv("WHISPER_BIN", "whisper-cli")
+        self.whisper_server_bin = os.getenv("WHISPER_SERVER_BIN", "whisper-server")
+        self.whisper_port = int(os.getenv("WHISPER_PORT", "8080"))
         whisper_model = os.getenv("WHISPER_MODEL_PATH", "~/models/whisper/ggml-medium.en.bin")
         self.whisper_model_path = expand_path(whisper_model)
         self.whisper_timeout = int(os.getenv("WHISPER_TIMEOUT", "60"))

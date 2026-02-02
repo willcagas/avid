@@ -9,6 +9,8 @@ import os
 import subprocess
 from pathlib import Path
 
+import requests
+
 from .config import Config
 from .utils import setup_logging
 
@@ -34,10 +36,10 @@ class Transcriber:
 
     def transcribe(self, audio_path: str) -> str:
         """
-        Transcribe an audio file to text.
+        Transcribe an audio file using the local whisper server.
         
         Args:
-            audio_path: Path to the WAV file (must be 16kHz mono)
+            audio_path: Path to the WAV file
         
         Returns:
             Transcript text, or empty string on failure
@@ -47,51 +49,46 @@ class Transcriber:
             logger.error(f"Audio file not found: {audio_path}")
             return ""
 
-        # Output file path (whisper-cpp adds .txt extension)
-        output_base = str(audio_file.with_suffix(""))
-        output_txt = output_base + ".txt"
-
-        # Build whisper-cpp command
-        cmd = [
-            self.whisper_bin,
-            "-m", self.model_path,
-            "-f", audio_path,
-            "-t", str(self.threads),
-            "-otxt",  # Output to txt file
-            "-of", output_base,  # Output file base name
-            "--no-timestamps",  # Don't include timestamps
-        ]
-
-        logger.info(f"Transcribing: {audio_path}")
-
+        url = f"http://127.0.0.1:{self.config.whisper_port}/inference"
+        
+        logger.info(f"Transcribing via server: {audio_path}")
+        
         try:
-            subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=True,
-                timeout=self.timeout
-            )
-
-            # Read the output text file
-            if Path(output_txt).exists():
-                transcript = Path(output_txt).read_text().strip()
-                # Clean up the output file
-                Path(output_txt).unlink()
+            with open(audio_file, 'rb') as f:
+                files = {'file': f}
+                # response_format='text' creates simpler output, or json for more details
+                # whisper.cpp server usually takes multipart/form-data
+                response = requests.post(
+                    url, 
+                    files=files, 
+                    data={'response_format': 'text'},
+                    timeout=self.timeout
+                )
+            
+            if response.status_code == 200:
+                transcript = response.text.strip()
+                # If json is returned despite requesting text, parse it
+                # But standard whisper-server output depends on implementation. 
+                # Let's assume text for now based on typical usage, 
+                # or we can parse JSON if it returns that.
+                # Actually, whisper.cpp server default might be JSON. 
+                # Let's try to parse JSON if it looks like it.
+                
+                try:
+                    data = response.json()
+                    if 'text' in data:
+                        transcript = data['text'].strip()
+                except Exception:
+                    pass # It was probably plain text
+                
                 logger.info(f"Transcription complete: {len(transcript)} chars")
                 return transcript
             else:
-                logger.error("Whisper did not produce output file")
+                logger.error(f"Server error {response.status_code}: {response.text}")
                 return ""
 
-        except subprocess.CalledProcessError as e:
-            logger.error(f"Whisper failed: {e.stderr}")
-            return ""
-        except subprocess.TimeoutExpired:
-            logger.error("Whisper timed out")
-            return ""
-        except FileNotFoundError:
-            logger.error(f"Whisper binary not found: {self.whisper_bin}")
+        except requests.exceptions.ConnectionError:
+            logger.error("Could not connect to Whisper server. Is it running?")
             return ""
         except Exception as e:
             logger.error(f"Transcription error: {e}")
