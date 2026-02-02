@@ -27,6 +27,7 @@ class Transcriber:
         Args:
             config: Application configuration with whisper settings
         """
+        self.config = config
         self.whisper_bin = config.whisper_bin
         self.model_path = config.whisper_model_path
         self.timeout = config.whisper_timeout
