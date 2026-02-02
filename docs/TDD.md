@@ -72,8 +72,9 @@
 
 ### ASR (local)
 
-* `whisper.cpp` installed via Homebrew (`brew install whisper-cpp`) or bundled later
-* Model: `ggml-base.en.bin` (fast, solid), upgrade to `small.en` if desired
+* `whisper.cpp` installed via Homebrew (`brew install whisper-cpp`)
+* **Local Server**: Uses `whisper-server` for persistent model loading (zero latency)
+* Model: `ggml-medium.en-q5_0.bin` (quantized for high speed/accuracy on Apple Silicon)
 
 ### Formatter (cloud LLM)
 
@@ -115,9 +116,11 @@
    * Outputs `audio.wav` (16kHz mono)
 
 3. **Transcriber (Whisper)**
+   
+   * Sends audio via HTTP to local `whisper-server` (`localhost:8080`)
+   * Avoids model loading overhead (instant response)
+   * Server managed by `src/server.py` lifecycle
 
-   * Invokes `whisper-cpp` CLI with model path and wav path
-   * Parses transcript output (text)
 
 4. **Formatter (LLM)**
 
@@ -165,6 +168,7 @@ ai-dictation/
     config.py
     hotkeys.py
     audio.py
+    server.py       (NEW: manages whisper-server process)
     transcribe.py
     format_llm.py
     inject.py

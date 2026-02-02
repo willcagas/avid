@@ -13,7 +13,7 @@
 
 ## Overview
 
-**AViD** allows you to dictate text using Push-to-Talk, transcribing it locally with `whisper.cpp` for speed and privacy, then instantly rewriting it via GPT-4o into polished text before auto-pasting it into your active window.
+**AViD** allows you to dictate text using Push-to-Talk, transcribing it locally with `whisper-server` (quantized for Apple Silicon) for fast, private ASR, then instantly rewriting it via GPT-4o into polished text before auto-pasting it into your active window.
 
 - **Local Transcription**: Uses `whisper.cpp` (Metal accelerated) for fast, private ASR.
 - **AI Formatting**: Cloud LLM rewrites your raw speech into structured text.
@@ -43,12 +43,14 @@ brew install whisper-cpp
 
 ### 2. Download Whisper Model
 
-Download a model for local transcription (Base English recommended for speed/accuracy balance):
-
+Download the quantized model (optimized for speed/accuracy balance on Apple Silicon):
 ```bash
-mkdir -p ~/models/whisper
-cd ~/models/whisper
-curl -L -o ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+# Run the helper script to download and quantize automatically
+./scripts/download_model.sh
+./scripts/quantize_model.sh
+
+# Or download manually (if available directly)
+# curl -L -o ggml-medium.en-q5_0.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.en-q5_0.bin
 ```
 
 ### 3. Clone & Python Setup
