@@ -80,6 +80,11 @@ class DictationApp:
 
         # Start amplitude tracking for UI
         if self._ui:
+            # Ensure previous thread is cleaned up
+            if self._amplitude_thread and self._amplitude_thread.is_alive():
+                self._recording = False
+                self._amplitude_thread.join(timeout=1.0)
+
             self._amplitude_thread = threading.Thread(
                 target=self._update_amplitude,
                 daemon=True
@@ -89,6 +94,11 @@ class DictationApp:
     def on_ptt_release(self) -> None:
         """Handle PTT key release - process audio pipeline."""
         self._recording = False
+        
+        # Wait for amplitude thread to finish
+        if self._amplitude_thread and self._amplitude_thread.is_alive():
+            self._amplitude_thread.join(timeout=1.0)
+
         temp_path = get_temp_audio_path()
 
         # Play stop sound
