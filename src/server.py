@@ -32,8 +32,7 @@ class WhisperServer:
             self.config.whisper_server_bin,
             "-m", self.config.whisper_model_path,
             "--port", str(self.config.whisper_port),
-            "--host", "127.0.0.1",
-            "--ng"  # No GPU (assuming cpu for now as per previous checks, maybe make configurable?) 
+            "--host", "127.0.0.1" 
             # Actually, standard whisper-server might auto-detect metal on mac. 
             # Let's check if --ng is needed explicitly or just safe. 
             # Looking at help output: -ng, --no-gpu [false] default. So it tries to use GPU by default.
