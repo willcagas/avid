@@ -135,9 +135,15 @@ class AudioRecorder:
             # Use the most recent frame
             recent_frame = self._frames[-1]
             # Calculate RMS (root mean square) amplitude
-            rms = np.sqrt(np.mean(recent_frame ** 2))
-            # Normalize to 0-1 range (typical speech is around 0.01-0.1 RMS)
-            amplitude = min(1.0, rms * 10)
+            rms = float(np.sqrt(np.mean(recent_frame ** 2)))
+
+            # Suppress very low-level background noise while idle.
+            if rms < 0.002:
+                return 0.0
+
+            # Apply a non-linear loudness curve so normal speech produces
+            # visibly larger waveform movement instead of staying tiny.
+            amplitude = min(1.0, (rms * 24.0) ** 0.65)
             return float(amplitude)
         except Exception:
             return 0.0

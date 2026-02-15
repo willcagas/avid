@@ -171,9 +171,12 @@ function showRecording() {
 
 // Update waveform with amplitude
 function updateWaveform(amplitude) {
+    const clamped = Math.max(0, Math.min(1, Number(amplitude) || 0));
+    const boosted = Math.pow(clamped, 0.55);
+
     // Shift bars left and add new amplitude
     waveformBars.shift();
-    waveformBars.push(amplitude);
+    waveformBars.push(boosted);
 }
 
 // Animate the waveform
@@ -185,14 +188,15 @@ function startWaveformAnimation() {
         ctx.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height);
 
         const barWidth = waveformCanvas.width / waveformBars.length;
-        const maxHeight = waveformCanvas.height * 0.8;
+        const maxHeight = waveformCanvas.height * 0.95;
         const centerY = waveformCanvas.height / 2;
 
         // Draw bars
         waveformBars.forEach((amp, i) => {
             // Add some randomness for visual effect
-            const noise = Math.random() * 0.1;
-            const height = Math.max(4, (amp + noise) * maxHeight);
+            const jitter = (Math.random() - 0.5) * (0.06 + amp * 0.08);
+            const visualAmp = Math.max(0, Math.min(1, amp + jitter));
+            const height = Math.max(6, visualAmp * maxHeight);
 
             // Gradient color based on amplitude (Pink theme)
             // Light Pink #FFB6C1 is roughly hue 350
