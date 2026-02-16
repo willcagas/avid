@@ -55,24 +55,34 @@ class AudioRecorder:
         if self._is_recording:
             self._frames.append(indata.copy())
 
-    def start_recording(self) -> None:
+    def start_recording(self) -> bool:
         """Start recording audio from the microphone."""
         with self._lock:
             if self._is_recording:
                 logger.warning("Already recording")
-                return
+                return True
 
-            self._frames = []
-            self._is_recording = True
+            try:
+                if self._stream is None:
+                    self._stream = sd.InputStream(
+                        samplerate=self.sample_rate,
+                        channels=self.channels,
+                        dtype=DTYPE,
+                        callback=self._audio_callback
+                    )
+                    self._stream.start()
+                elif not self._stream.active:
+                    self._stream.start()
 
-            self._stream = sd.InputStream(
-                samplerate=self.sample_rate,
-                channels=self.channels,
-                dtype=DTYPE,
-                callback=self._audio_callback
-            )
-            self._stream.start()
-            logger.info("Recording started")
+                self._frames = []
+                self._is_recording = True
+                logger.info("Recording started")
+                return True
+            except Exception as e:
+                self._is_recording = False
+                self._stream = None
+                logger.error(f"Failed to start recording stream: {e}")
+                return False
 
     def stop_recording(self, output_path: str) -> bool:
         """
@@ -90,31 +100,46 @@ class AudioRecorder:
                 return False
 
             self._is_recording = False
+            stream = self._stream
+            frames_snapshot = list(self._frames)
 
-            if self._stream:
-                self._stream.stop()
-                self._stream.close()
-                self._stream = None
+        if not frames_snapshot:
+            logger.warning("No audio frames captured")
+            return False
 
-            if not self._frames:
-                logger.warning("No audio frames captured")
-                return False
+        # Concatenate all frames
+        audio_data = np.concatenate(frames_snapshot, axis=0)
 
-            # Concatenate all frames
-            audio_data = np.concatenate(self._frames, axis=0)
+        # Convert float32 to int16 for WAV file
+        audio_int16 = (audio_data * 32767).astype(np.int16)
 
-            # Convert float32 to int16 for WAV file
-            audio_int16 = (audio_data * 32767).astype(np.int16)
+        # Save as WAV
+        try:
+            wavfile.write(output_path, self.sample_rate, audio_int16)
+            duration = len(audio_data) / self.sample_rate
+            logger.info(f"Recording saved: {output_path} ({duration:.1f}s)")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save audio: {e}")
+            return False
 
-            # Save as WAV
+    def shutdown(self) -> None:
+        """Close the persistent audio stream when app exits."""
+        with self._lock:
+            stream = self._stream
+            self._stream = None
+            self._is_recording = False
+
+        if stream:
             try:
-                wavfile.write(output_path, self.sample_rate, audio_int16)
-                duration = len(audio_data) / self.sample_rate
-                logger.info(f"Recording saved: {output_path} ({duration:.1f}s)")
-                return True
-            except Exception as e:
-                logger.error(f"Failed to save audio: {e}")
-                return False
+                if stream.active:
+                    stream.abort()
+            except Exception:
+                pass
+            try:
+                stream.close()
+            except Exception:
+                pass
 
     @property
     def is_recording(self) -> bool:

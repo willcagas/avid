@@ -81,7 +81,11 @@ class DictationApp:
                 self._ui.show_recording()
 
         # Start recording
-        self.audio.start_recording()
+        if not self.audio.start_recording():
+            logger.warning("Failed to start recording")
+            if self._ui:
+                self._ui.hide()
+            return
         self._recording = True
 
         # Start amplitude tracking for UI
@@ -152,7 +156,6 @@ class DictationApp:
         # Show success
         if self._ui:
             self._ui.show_success()
-
         logger.info("✅ Done!")
 
     def _run_hotkey_listener(self) -> None:
@@ -244,6 +247,7 @@ class DictationApp:
         """Stop the application."""
         self._running = False
         self._recording = False
+        self.audio.shutdown()
         if self.hotkey_listener:
             self.hotkey_listener.stop()
         if self._ui:
